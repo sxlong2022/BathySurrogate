@@ -34,7 +34,6 @@ DEFAULT_CONFIG_PATH = CONFIG_DIR / "figures.yaml"
 DATA_ROOT_ENV = "BATHYSURROGATE_DATA_ROOT"
 
 #: Prefixes that resolve against the data root instead of the code root.
-#: Prefixes that resolve against the data root instead of the code root.
 DATA_PREFIXES = ("results", "intermediate_results", "logging")
 
 # Make the package importable when a script is run directly from scripts/.

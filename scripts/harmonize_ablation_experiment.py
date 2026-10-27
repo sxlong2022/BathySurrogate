@@ -270,7 +270,7 @@ def run_experiment(config: Dict) -> Tuple[str, Dict[str, Dict[str, float]]]:
         print(f"{name:<12} | R2 {stats['r2']:+.3f} | r {stats['corr']:+.3f} | "
               f"RMSE {stats['rmse']:5.2f} m | MAE {stats['mae']:5.2f} m | retrained")
 
-    archive_path = resolve_input(config, "ablation_results")
+    archive_path = resolve_output(config, "ablation_results")
     os.makedirs(os.path.dirname(archive_path), exist_ok=True)
     np.savez(
         archive_path,

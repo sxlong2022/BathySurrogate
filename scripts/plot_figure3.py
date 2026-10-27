@@ -24,7 +24,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from _common import (apply_style, calc_metrics, load_config, report,
-                     require_file, resolve_input, save_figure)
+                     require_file, resolve_output, save_figure)
 
 
 def main() -> int:
@@ -35,7 +35,7 @@ def main() -> int:
     apply_style(config)
 
     archive_path = require_file(
-        resolve_input(config, "ablation_results"),
+        resolve_output(config, "ablation_results"),
         "Run: python scripts/harmonize_ablation_experiment.py",
     )
     archive = np.load(archive_path)
