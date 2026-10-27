@@ -84,8 +84,27 @@ All verification checks should report `[PASS]`.
 |   \-- utils.py                       # Spatio-temporal array utilities and validation
 |-- configs/                           # Externalized YAML configuration files
 |   |-- classic_models.yaml            # Random Forest hyperparameters & feature configs
-|   \-- s3gm_default.yaml              # Diffusion SDE, VPSDE, and DPS sampling parameters
-\-- S3GM/Code/                         # S³GM neural core (adapted from Li et al., 2024)
+|   |-- s3gm_default.yaml              # Diffusion SDE, VPSDE, and DPS sampling parameters
+|   \-- figures.yaml                   # Figure pipeline paths, styling, and ablation tiers
+|-- scripts/                           # Reproducible analysis and figure pipeline
+|   |-- _common.py                     # Shared paths, metrics, and publication styling
+|   |-- build_oof_predictions.py       # Builds the out-of-fold SSOT prediction table
+|   |-- build_rf_time_series.py        # Annual surrogate raster stack (2018-2023)
+|   |-- harmonize_ablation_experiment.py  # 12-feature ablation ladder
+|   |-- generate_ablation_data_and_plot.py # Ablation experiment + Figure 3
+|   |-- compute_block_sensitivity.py   # 4x4 vs 6x6 block geometry check (Table S3)
+|   |-- compute_block_wilcoxon.py      # Block-level paired Wilcoxon tests
+|   |-- compute_strata_metrics.py      # Depth and distance stratification tables
+|   |-- compute_temporal_metrics.py    # Year-to-year consistency metrics
+|   |-- plot_figure3.py                # Figure 3  Feature ablation ladder
+|   |-- plot_figure4.py                # Figure 4  Multi-model OOF scatter
+|   |-- plot_figure5.py                # Figure 5  Block-level inference
+|   |-- plot_figure6.py                # Figure 6  Depth and distance strata
+|   |-- plot_figure7.py                # Figure 7  Decadal mapping
+|   |-- plot_figure_s2.py              # Figure S2 S3GM performance dichotomy
+|   |-- plot_figure_s3.py              # Figure S3 Block geometry sensitivity
+|   \-- plot_all_figures.py            # Renders Figures 3-7 and S2-S3
+\-- S3GM/Code/                         # S3GM neural core (adapted from Li et al., 2024)
     |-- models/                        # U-Net video architecture with RPE
     |-- sampler/                       # VP-SDE predictor-corrector with DPS guidance
     \-- trainer/                       # Score matching loss and dataset loaders
@@ -139,7 +158,57 @@ python run_bathymetry.py --stage 5
 > ee.Initialize(project='YOUR_GEE_PROJECT_ID')
 > ```
 
+## Reproducing the Manuscript Figures
+
+The `scripts/` directory regenerates every analysis table and figure from
+stored artefacts. Derived data (`results/`, `intermediate_results/`) is
+excluded from version control. Point the pipeline at an existing data tree
+with an environment variable:
+
+```bash
+export BATHYSURROGATE_DATA_ROOT=/path/to/data_tree   # Linux/macOS
+set BATHYSURROGATE_DATA_ROOT=D:\path\to\data_tree     # Windows
+```
+
+When the variable is unset, the repository root is used.
+
+### 1. Build the Shared Artefacts
+
+```bash
+python scripts/build_oof_predictions.py     # out-of-fold SSOT table
+python scripts/build_rf_time_series.py      # annual surrogate stack
+python scripts/compute_block_sensitivity.py # Table S3 geometry check
+```
+
+### 2. Run the Statistical Analyses
+
+```bash
+python scripts/compute_block_wilcoxon.py    # block-level paired tests
+python scripts/compute_strata_metrics.py    # depth and distance strata
+python scripts/compute_temporal_metrics.py  # year-to-year consistency
+```
+
+### 3. Render the Figures
+
+```bash
+python scripts/generate_ablation_data_and_plot.py  # Figure 3
+python scripts/plot_all_figures.py                # Figures 3-7 and S2-S3
+```
+
+Each figure is written to `results/Figures/<name>/` as a 300 dpi PNG and
+a vector PDF. Figure 1 (study area) and Figure 2 (validation protocol) are
+produced by the cartography stage and a vector editor respectively.
+
+### Reporting Conventions
+
+- All metrics derive from out-of-fold predictions in
+  `results/validation/oof_predictions_all_models.csv`.
+- Statistical inference operates on spatial blocks, never on pixels.
+- The distance metric is written `IDW (power = 4)`. The symbol `p` is
+  reserved for statistical p-values and probability densities.
+
 ## Configuration
+
 
 All model hyperparameters and feature engineering settings are externalized into human-readable YAML files:
 

@@ -1,0 +1,207 @@
+# Figure and Analysis Pipeline Configuration
+#
+# Externalized settings for the manuscript figure pipeline (scripts/).
+# All paths are relative to the repository root.
+
+# ---------------------------------------------------------------------------
+# Input data contracts (produced by run_bathymetry.py stages 1.5, 1.8 and 2)
+# ---------------------------------------------------------------------------
+inputs:
+  spatial_folds: intermediate_results/validation/spatial_folds.npz
+  sentinel_series: intermediate_results/sentinel_time_series.npy
+  gebco_series: intermediate_results/gebco_time_series.npy
+  rf_params_full: intermediate_results/model_params/rf_params.npy
+  rf_model_full: intermediate_results/model_params/rf_model.joblib
+  rf_params_fold: intermediate_results/model_params/rf_params_fold_{fold}.npy
+  rf_model_fold: intermediate_results/model_params/rf_model_fold_{fold}.joblib
+  oof_predictions: results/validation/oof_predictions_all_models.csv
+  ablation_results: intermediate_results/ablation_results.npz
+  rf_time_series: results/classic_models/rf_time_series_enh.npy
+  s3gm_year: results/s3gm_time_series/bathymetry_{year}.npy
+  s3gm_fold_year: results/s3gm_time_series/fold_{fold}/bathymetry_{year}.npy
+  land_water_mask: results/s3gm_visualization/land_water_mask.tif
+
+# ---------------------------------------------------------------------------
+# Output roots
+# ---------------------------------------------------------------------------
+outputs:
+  figures_root: results/Figures
+  validation_dir: results/validation
+
+# ---------------------------------------------------------------------------
+# Study area and grid geometry
+# ---------------------------------------------------------------------------
+domain:
+  # Bounding box [west, south, east, north] in EPSG:4326
+  extent: [122.35, 30.62, 122.60, 30.80]
+  # Side length of the study area in km, used to convert normalized
+  # nearest-neighbour distances to physical distances.
+  roi_side_km: 64.0
+  grid_size: 64
+  years: [2018, 2019, 2020, 2021, 2022, 2023]
+  # Normalized coordinate binning used to derive 4x4 spatial block identifiers.
+  n_blocks_per_axis: 4
+  # Depth limits used for metric clipping and colour scaling.
+  depth_min: 0.1
+  depth_max: 75.0
+  # Depth axis limit used by scatter panels.
+  scatter_limit: 75.0
+  # Depth value assigned to land / invalid pixels during normalization.
+  land_value: 1.5
+
+# ---------------------------------------------------------------------------
+# Stratification thresholds reported in the manuscript
+# ---------------------------------------------------------------------------
+strata:
+  # Depth strata boundaries in metres
+  shallow_max: 10.0
+  intermediate_max: 30.0
+  # Operational distance-to-nearest-sounding regimes in km
+  near_max_km: 1.9
+  transition_max_km: 6.3
+
+# ---------------------------------------------------------------------------
+# Model registry. Keys must match columns of the OOF prediction table.
+# ---------------------------------------------------------------------------
+models:
+  lyzenga:
+    label: Lyzenga log-linear (1978)
+    short_label: Lyzenga (1978)
+    color: '#7f8c8d'
+    marker: s
+  stumpf:
+    label: Stumpf ratio (2003)
+    short_label: Stumpf (2003)
+    color: '#8e44ad'
+    marker: D
+  idw:
+    label: IDW (power = 4)
+    short_label: IDW (power = 4)
+    color: '#d35400'
+    marker: ^
+  rf_old:
+    label: Optical-only RF (7 features)
+    short_label: Optical-only RF
+    color: '#c0392b'
+    marker: s
+  rf_enh:
+    label: Enhanced RF (12 features)
+    short_label: Enhanced RF
+    color: '#2980b9'
+    marker: o
+  s3gm:
+    label: S3GM diffusion
+    short_label: S3GM
+    color: '#16a085'
+    marker: 'o'
+
+# ---------------------------------------------------------------------------
+# Ablation ladder definition. Each tier lists the feature groups it enables.
+# ---------------------------------------------------------------------------
+ablation:
+  tiers:
+    - name: Spectral
+      n_features: 7
+      use_gebco: false
+      use_coords: false
+      use_neighbors: false
+      # Anchored to the SSOT column that encodes this tier.
+      ssot_column: rf_old
+    - name: '+GEBCO'
+      n_features: 8
+      use_gebco: true
+      use_coords: false
+      use_neighbors: false
+      ssot_column: null
+    - name: '+Coord'
+      n_features: 10
+      use_gebco: true
+      use_coords: true
+      use_neighbors: false
+      ssot_column: null
+    - name: '+NN'
+      n_features: 10
+      use_gebco: true
+      use_coords: false
+      use_neighbors: true
+      ssot_column: null
+    - name: Full (12)
+      n_features: 12
+      use_gebco: true
+      use_coords: true
+      use_neighbors: true
+      ssot_column: rf_enh
+
+# ---------------------------------------------------------------------------
+# Random Forest settings reused by the ablation experiment
+# ---------------------------------------------------------------------------
+rf:
+  n_estimators: 500
+  max_depth: 25
+  min_samples_split: 2
+  min_samples_leaf: 1
+  max_features: sqrt
+  bootstrap: true
+  random_state: 42
+  n_jobs: -1
+
+# ---------------------------------------------------------------------------
+# Publication styling (Elsevier EMS single-column layout)
+# ---------------------------------------------------------------------------
+style:
+  font_family: serif
+  font_serif: [Times New Roman, DejaVu Serif, Times]
+  mathtext_fontset: stix
+  font_size: 8.5
+  axes_labelsize: 9.0
+  xtick_labelsize: 8.0
+  ytick_labelsize: 8.0
+  legend_fontsize: 7.5
+  figure_dpi: 300
+  savefig_dpi: 300
+  axes_linewidth: 0.8
+  grid_linewidth: 0.5
+  grid_alpha: 0.3
+  panel_tag_size: 10.0
+
+# ---------------------------------------------------------------------------
+# Analysis settings
+# ---------------------------------------------------------------------------
+analysis:
+  bootstrap_resamples: 10000
+  bootstrap_seed: 42
+  # Minimum samples per distance bin before a bin is plotted
+  min_samples_per_bin: 3
+  distance_bins: 16
+
+# ---------------------------------------------------------------------------
+# Spatial block geometry sensitivity (Table S3).
+#
+# These are the published sensitivity values. Regenerate them with
+# scripts/compute_block_sensitivity.py, which writes
+# results/validation/block_sensitivity.csv. plot_figure_s3.py prefers that
+# CSV and falls back to the values below when it is absent.
+# ---------------------------------------------------------------------------
+block_sensitivity:
+  csv_path: results/validation/block_sensitivity.csv
+  protocols:
+    - key: 4x4
+      label: 4x4 blocks
+    - key: 6x6
+      label: 6x6 blocks
+  models: [lyzenga, idw, rf_enh]
+  table:
+    lyzenga:
+      4x4: {r2: -0.239, corr: -0.050, rmse: 14.23, mae: 10.61}
+      6x6: {r2: -0.251, corr: -0.048, rmse: 14.30, mae: 10.68}
+    idw:
+      4x4: {r2: 0.447, corr: 0.670, rmse: 9.51, mae: 6.73}
+      6x6: {r2: 0.386, corr: 0.635, rmse: 10.02, mae: 7.15}
+    rf_enh:
+      4x4: {r2: 0.483, corr: 0.706, rmse: 9.19, mae: 6.61}
+      6x6: {r2: 0.478, corr: 0.701, rmse: 9.24, mae: 6.64}
+  bootstrap_resamples: 10000
+  bootstrap_seed: 42
+  # Minimum samples per distance bin before a bin is plotted
+  min_samples_per_bin: 3
+  distance_bins: 16
