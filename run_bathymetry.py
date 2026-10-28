@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-BathySurrogate: An Open-Source Environmental Surrogate Framework for Satellite-Derived Bathymetry
+BathySurrogate: An Open-Source, Chart-Conditioned Geospatial Surrogate Framework for Coastal Bathymetry
 Pipeline Execution Script
 
 Usage:

@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "BathySurrogate: An Open-Source Environmental Surrogate Framework for Satellite-Derived Bathymetry via Multi-Source Data Fusion and Spatial Validation"
+title: "BathySurrogate: An Open-Source, Chart-Conditioned Geospatial Surrogate Framework for Coastal Bathymetry via Multi-Source Data Fusion and Spatial Validation"
 message: "If you use this software, please cite it as below."
 type: software
 authors:

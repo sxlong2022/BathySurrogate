@@ -1,17 +1,17 @@
 # BathySurrogate
 
-An Open-Source Environmental Surrogate Framework for Satellite-Derived Bathymetry via Multi-Source Data Fusion and Spatial Validation.
+An Open-Source, Chart-Conditioned Geospatial Surrogate Framework for Coastal Bathymetry via Multi-Source Data Fusion and Spatial Validation.
 
 ## Overview
 
-**BathySurrogate** is an open-source, modular Python computational framework designed for high-resolution Satellite-Derived Bathymetry (SDB) mapping in turbid and complex coastal waters. It implements a multi-source data fusion surrogate paradigm--coupling multi-temporal Sentinel-2 optical composites, GEBCO global bathymetric priors, and sparse in-situ nautical chart soundings--evaluated through a leak-proof Spatially Blocked 5-Fold Cross-Validation protocol.
+**BathySurrogate** is an open-source, modular Python computational framework designed for coastal bathymetric estimation under severe data sparsity in turbid and complex waters. It implements a chart-conditioned geospatial surrogate paradigm--coupling multi-temporal Sentinel-2 optical composites, GEBCO global bathymetric priors, and sparse in-situ nautical chart soundings--evaluated through a leakage-controlled Spatially Blocked 5-Fold Cross-Validation protocol.
 
 The framework features a 12-feature Enhanced Random Forest surrogate engine as its primary operational predictor, alongside an inverse score-based generative diffusion model (S³GM) with guided Diffusion Posterior Sampling (DPS) for conditional spatio-temporal reconstruction and uncertainty analysis.
 
 ## Highlights
 
 - **Modular Software Design**: Implements Strategy, Factory, and Pipeline architectural design patterns with externalized YAML configuration management.
-- **Leak-Proof Spatial Validation**: Enforces Spatially Blocked 5-Fold Cross-Validation (4 × 4 spatial grid) ensuring zero spatial autocorrelation leakage between training and evaluation splits.
+- **Leakage-Controlled Spatial Validation**: Enforces Spatially Blocked 5-Fold Cross-Validation (4 × 4 spatial grid) ensuring zero spatial autocorrelation leakage between training and evaluation splits in the Random Forest surrogate benchmark.
 - **Enhanced Surrogate Modeling**: Integrates 12 domain-specific features (spectral bands, band ratios, log transforms, spatial coordinates, GEBCO bathymetric priors, and nearest-neighbor sounding distances/depths) achieving pooled Out-of-Fold (OOF) R² = 0.483, Pearson r = 0.706, RMSE = 9.19 m, MAE = 6.61 m, and a range-normalized nRMSE = 12.61%.
 - **High-Performance Computation**: Low computational complexity (O(S × N × C²)), processing annual decadal mapping workflows in seconds on standard CPUs and minutes on consumer GPUs (NVIDIA RTX 2060, 6GB VRAM).
 - **FAIR4RS Compliance**: Adheres strictly to Findable, Accessible, Interoperable, and Reusable software standards with comprehensive test suites, metadata (`CITATION.cff`), and pinned environment definitions (`environment.yml`).
@@ -245,7 +245,7 @@ If you use BathySurrogate in your research, please cite:
 
 ```bibtex
 @article{song2026bathysurrogate,
-  title={BathySurrogate: An Open-Source Environmental Surrogate Framework for Satellite-Derived Bathymetry via Multi-Source Data Fusion and Spatial Validation},
+  title={BathySurrogate: An Open-Source, Chart-Conditioned Geospatial Surrogate Framework for Coastal Bathymetry via Multi-Source Data Fusion and Spatial Validation},
   author={Song, Xiaolong and Liu, Boliang and Xiao, Zhong and Xu, Haijue and Bai, Yuchuan},
   journal={Environmental Modelling \& Software},
   year={2026},
