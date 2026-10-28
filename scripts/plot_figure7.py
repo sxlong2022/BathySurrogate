@@ -95,6 +95,8 @@ def main() -> int:
 
         ax.set_title(f"({chr(ord('a') + index)}) {years[index]}", loc="left",
                      fontsize=9.0, fontweight="bold", pad=5)
+        ax.set_xticks([122.40, 122.50])
+        ax.set_yticks([30.65, 30.75])
 
         if index in (0, 3):
             ax.set_ylabel("Latitude (deg N)")
